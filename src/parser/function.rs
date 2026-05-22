@@ -519,6 +519,57 @@ lazy_static! {
             false
         ),
         function!("year", vec![ValueType::Vector], 1, ValueType::Vector, false),
+        // === ProjectASAP additions (MODIFIED from upstream, Apache-2.0 §4(b)) ===
+        // Experimental functions present in Prometheus `promql/parser/functions.go`
+        // but not yet in upstream promql-parser. Signatures mirror upstream Go
+        // (ArgTypes + Variadic). Reported upstream as a sync gap. Remove these once
+        // a promql-parser release includes them.
+        function!("mad_over_time", vec![ValueType::Matrix], 0, ValueType::Vector, true),
+        function!("first_over_time", vec![ValueType::Matrix], 0, ValueType::Vector, true),
+        function!("ts_of_first_over_time", vec![ValueType::Matrix], 0, ValueType::Vector, true),
+        function!("ts_of_last_over_time", vec![ValueType::Matrix], 0, ValueType::Vector, true),
+        function!("ts_of_max_over_time", vec![ValueType::Matrix], 0, ValueType::Vector, true),
+        function!("ts_of_min_over_time", vec![ValueType::Matrix], 0, ValueType::Vector, true),
+        function!(
+            "histogram_quantiles",
+            vec![
+                ValueType::Vector,
+                ValueType::String,
+                ValueType::Scalar,
+                ValueType::Scalar
+            ],
+            9,
+            ValueType::Vector,
+            true
+        ),
+        function!(
+            "info",
+            vec![ValueType::Vector, ValueType::Vector],
+            1,
+            ValueType::Vector,
+            true
+        ),
+        function!(
+            "max_of",
+            vec![ValueType::Scalar, ValueType::Scalar],
+            0,
+            ValueType::Scalar,
+            true
+        ),
+        function!(
+            "min_of",
+            vec![ValueType::Scalar, ValueType::Scalar],
+            0,
+            ValueType::Scalar,
+            true
+        ),
+        function!("step", vec![], 0, ValueType::Scalar, true),
+        function!("range", vec![], 0, ValueType::Scalar, true),
+        // NOTE: `start()` / `end()` are NOT added here — `start`/`end` are
+        // reserved lexer keywords for the `@ start()` / `@ end()` modifier, so a
+        // function-table entry alone can't make them callable; supporting them as
+        // standalone functions needs lexer/grammar changes (deferred).
+        // === end ProjectASAP additions ===
     ]);
 }
 
