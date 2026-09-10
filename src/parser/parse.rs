@@ -1369,6 +1369,18 @@ mod tests {
                     )
                 })
             }),
+            ("l2_over_time(some_metric[5m])", {
+                Expr::new_matrix_selector(
+                    Expr::from(VectorSelector::from("some_metric")),
+                    duration::MINUTE_DURATION * 5,
+                )
+                .and_then(|ex| {
+                    Expr::new_call(
+                        get_function("l2_over_time").unwrap(),
+                        FunctionArgs::new_args(ex),
+                    )
+                })
+            }),
             ("round(some_metric)", {
                 let ex = Expr::from(VectorSelector::from("some_metric"));
                 Expr::new_call(get_function("round").unwrap(), FunctionArgs::new_args(ex))
