@@ -264,6 +264,14 @@ lazy_static! {
             ValueType::Vector,
             false
         ),
+        // MetricsQL extension.
+        function!(
+            "l2_over_time",
+            vec![ValueType::Matrix],
+            0,
+            ValueType::Vector,
+            false
+        ),
         function!("exp", vec![ValueType::Vector], 0, ValueType::Vector, false),
         function!(
             "first_over_time",
