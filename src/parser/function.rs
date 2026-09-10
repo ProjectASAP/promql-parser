@@ -247,7 +247,23 @@ lazy_static! {
             ValueType::Vector,
             false
         ),
+        // MetricsQL extension.
+        function!(
+            "distinct_over_time",
+            vec![ValueType::Matrix],
+            0,
+            ValueType::Vector,
+            false
+        ),
         function!("end", vec![], 0, ValueType::Scalar, true),
+        // MetricsQL extension.
+        function!(
+            "entropy_over_time",
+            vec![ValueType::Matrix],
+            0,
+            ValueType::Vector,
+            false
+        ),
         function!("exp", vec![ValueType::Vector], 0, ValueType::Vector, false),
         function!(
             "first_over_time",
@@ -668,13 +684,20 @@ mod tests {
         let rate = get_function("rate").unwrap();
         assert_eq!(rate.variadic, 0);
         assert!(!rate.experimental);
-
         for func_name in ["max_of", "min_of"] {
             let func = get_function(func_name).unwrap();
             assert_eq!(func.arg_types, vec![ValueType::Scalar, ValueType::Scalar]);
             assert_eq!(func.variadic, 0);
             assert_eq!(func.return_type, ValueType::Scalar);
             assert!(func.experimental);
+        }
+
+        for func_name in ["distinct_over_time", "entropy_over_time"] {
+            let func = get_function(func_name).unwrap();
+            assert_eq!(func.arg_types, vec![ValueType::Matrix]);
+            assert_eq!(func.variadic, 0);
+            assert_eq!(func.return_type, ValueType::Vector);
+            assert!(!func.experimental);
         }
     }
 }
