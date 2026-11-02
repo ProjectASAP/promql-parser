@@ -1404,6 +1404,30 @@ mod tests {
                     FunctionArgs::new_args(Expr::from(1.0)).append_args(Expr::from(2.0)),
                 )
             }),
+            ("integral(some_metric[5m])", {
+                Expr::new_matrix_selector(
+                    Expr::from(VectorSelector::from("some_metric")),
+                    duration::MINUTE_DURATION * 5,
+                )
+                .and_then(|ex| {
+                    Expr::new_call(
+                        get_function("integral").unwrap(),
+                        FunctionArgs::new_args(ex),
+                    )
+                })
+            }),
+            ("integral(some_metric[5m], 1)", {
+                Expr::new_matrix_selector(
+                    Expr::from(VectorSelector::from("some_metric")),
+                    duration::MINUTE_DURATION * 5,
+                )
+                .and_then(|ex| {
+                    Expr::new_call(
+                        get_function("integral").unwrap(),
+                        FunctionArgs::new_args(ex).append_args(Expr::from(1.0)),
+                    )
+                })
+            }),
             ("double_exponential_smoothing(some_metric[5m], 0.5, 0.1)", {
                 Expr::new_matrix_selector(
                     Expr::from(VectorSelector::from("some_metric")),
@@ -1899,6 +1923,22 @@ mod tests {
                 "expected type matrix in call to function 'rate', got vector",
             ),
             (
+                "integral(some_metric)",
+                "expected type matrix in call to function 'integral', got vector",
+            ),
+            (
+                "integral()",
+                "expected at least 1 argument(s) in call to 'integral', got 0",
+            ),
+            (
+                "integral(some_metric[5m], 1, 2)",
+                "expected at most 2 argument(s) in call to 'integral', got 3",
+            ),
+            (
+                r#"integral(some_metric[5m], "strategy")"#,
+                "expected type scalar in call to function 'integral', got string",
+            ),
+            (
                 "ln(1)",
                 "expected type vector in call to function 'ln', got scalar",
             ),
@@ -2307,14 +2347,17 @@ mod tests {
                     Expr::from(VectorSelector::from("bar")),
                 )
             }),
+            // start() and end() are also functions (Prometheus conformance).
+            (
+                "start()",
+                Expr::new_call(get_function("start").unwrap(), FunctionArgs::empty_args()),
+            ),
+            (
+                "end()",
+                Expr::new_call(get_function("end").unwrap(), FunctionArgs::empty_args()),
+            ),
         ];
         assert_cases(Case::new_result_cases(cases));
-
-        let cases = vec![
-            ("start()", INVALID_QUERY_INFO),
-            ("end()", INVALID_QUERY_INFO),
-        ];
-        assert_cases(Case::new_fail_cases(cases));
     }
 
     #[test]
